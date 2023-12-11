@@ -1,18 +1,36 @@
+/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { Global } from '../../helpers/Global';
 
 export const File = () => {
     const [files, setFiles] = useState([]);
-    
+
     const [searchTerm, setSearchTerm] = useState('');
-    
+
     const [stored, setStored] = useState("not_stored");
-    
+
     const [selectedFileName, setSelectedFileName] = useState(null);
 
     const [currentPage, setCurrentPage] = useState(1);
     const filesPerPage = 5;
+
+    //DE MOMENTO
+    const handleFileInputChange = (e) => {
+        const file = e.target.files[0];
+        console.log(file);
+
+        if (file) {
+            // Crear un enlace directo al archivo local
+            const fileURL = URL.createObjectURL(file);
+            console.log(fileURL);
+
+            // Abrir el archivo en una nueva ventana o pestaña
+            setTimeout(() => {
+                window.open(fileURL);
+            }, 500);
+        }
+    };
 
     const handleFileChange = (e) => {
         if (e.target.files[0]) {
@@ -66,8 +84,23 @@ export const File = () => {
         const fileInput = document.querySelector("#file0");
 
         if (fileInput.files[0]) {
+
+            const fileObject = {
+                name: fileInput.files[0].name,
+                lastModified: fileInput.files[0].lastModified,
+                lastModifiedDate: fileInput.files[0].lastModifiedDate,
+                size: fileInput.files[0].size,
+                type: fileInput.files[0].type,
+                webkitRelativePath: fileInput.files[0].webkitRelativePath
+            };
+
+            const file = fileInput.files[0];
+            console.log(file);
+
             const formData = new FormData();
             formData.append("file0", fileInput.files[0]);
+            formData.append("fileMetadata", JSON.stringify(fileObject));
+            // formData.append("fileURL", file);
 
             const uploadRequest = await fetch(Global.url + "file/upload", {
                 method: "POST",
@@ -109,17 +142,36 @@ export const File = () => {
                             {currentFiles.length > 0 ? (
                                 currentFiles.map((file) => (
                                     <li key={file._id}>
-                                        <a
-                                            href={`ms-word:file://C:/Users/balbi/OneDrive/Escritorio/Telefonica_api_rest/uploads/files/${file.file}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                        >
-                                            {file.file.split("-")[2]}
-                                        </a>
+                                        {file.file.endsWith(".pdf") ? (
+                                            <a>{file.file.split("-")[2]}</a>
+                                        ) : file.file.endsWith(".doc") || file.file.endsWith(".docx") ? (
+                                                <a
+                                                    href={`ms-word:file://C:/Users/balbi/OneDrive/Escritorio/Telef_proyect/Telefonica_api_rest/uploads/files/${file.file}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    {file.file.split("-")[2]}
+                                                </a>
+                                        ) : file.file.endsWith(".csv") || file.file.endsWith(".xlsx") ? (
+                                            <a
+                                                    href={`ms-excel:file://C:/Users/balbi/OneDrive/Escritorio/Telef_proyect/Telefonica_api_rest/uploads/files/${file.file}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    {file.file.split("-")[2]}
+                                                </a>
+                                        ) : (
+                                            // Manejar otros tipos de archivos según sea necesario
+                                            <span>Archivo no compatible: {file.file}</span>
+                                        )}
                                     </li>
                                 ))
-                            ) : <li>No hay archivos</li>}
+                            ) : (
+                                <li>No hay archivos</li>
+                            )}
                         </ul>
+
+
                         <div className="pagination">
                             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                                 <button key={page} type="button" onClick={() => handlePageChange(page)} className='paginationBtn'>
@@ -127,6 +179,18 @@ export const File = () => {
                                 </button>
 
                             ))}
+                        </div>
+
+                        <div>
+                            <input
+                                type="file"
+                                name='file1'
+                                id='file1'
+                                onChange={handleFileInputChange}
+                            />
+                            <label htmlFor="file1" className='fileLabel' style={{marginTop: '20px', backgroundColor: '#f54444'}}>
+                                {selectedFileName ? selectedFileName : "Selecciona un .pdf"}
+                            </label>
                         </div>
                     </form>
                 </div>
@@ -146,7 +210,7 @@ export const File = () => {
                             type="file"
                             name="file0"
                             id="file0"
-                            accept=".pdf, .doc, .docx, .txt"
+                            accept=".pdf, .doc, .docx, .txt .csv"
                             onChange={handleFileChange}
                         />
                         <label htmlFor="file0" className='fileLabel'>

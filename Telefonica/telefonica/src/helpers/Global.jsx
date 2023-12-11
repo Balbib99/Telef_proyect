@@ -1,3 +1,5 @@
+const URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3900";
+
 export const Global = {
-    url: "http://localhost:3900/api/"
+    url: `${URL}/api/`
 };

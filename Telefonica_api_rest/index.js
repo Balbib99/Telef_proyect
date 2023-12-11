@@ -2,6 +2,7 @@
 const { connection } = require("./database/connection");
 const express = require("express");
 const cors = require("cors");
+const { PORT } = require("./config");
 
 // Mensaje de bienvenida
 console.log("API REST para TELEFONICA arrancada!!");
@@ -11,7 +12,6 @@ connection();
 
 // Creando servidor node
 const app = express();
-const puerto = 3900;
 
 // Configurar cors
 app.use(cors());
@@ -47,6 +47,6 @@ app.get("/ruta-prueba", (req, res) => {
 })
 
 // Poner servidor a escuchar peticiones http
-app.listen(puerto, () => {
-    console.log("Servidor node corriendo en el puerto: " + puerto);
+app.listen(PORT, () => {
+    console.log("Servidor node corriendo en el puerto: " + PORT);
 })

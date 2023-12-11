@@ -8,6 +8,9 @@ const FileSchema = Schema({
     file: {
         type: String
     },
+    fileMetadata: {
+        type: Object
+    },
     created_at: {
         type: Date,
         default: Date.now

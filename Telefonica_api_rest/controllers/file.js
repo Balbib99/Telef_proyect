@@ -20,11 +20,9 @@ const upload = (req, res) => {
 
     // Conseguir el nombre del archivo
     let file = req.file.originalname;
-    
 
     // Sacar la extensión del archivo
     const ext = file.split("\.")[1];
-    console.log(ext);
 
     // Comprobar extensión
     if (ext != "doc" && ext != "docm" && ext != "docx" && ext != "dot" && ext && "txt" && ext != "pdf") {
@@ -40,7 +38,8 @@ const upload = (req, res) => {
 
     } else {
 
-        let newFile = new File({file: req.file.filename});
+        let newFile = new File({file: req.file.filename, fileMetadata: JSON.parse(req.body.fileMetadata)});
+        console.log(req.body.fileMetadata);
         newFile.user = req.user.id;
 
         newFile.save().then((fileStorage) => {
