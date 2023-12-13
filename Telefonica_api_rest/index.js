@@ -13,19 +13,18 @@ connection();
 
 // Creando servidor node
 const app = express();
-const server = http.createServer(app);
+
+// Configurar cors con opciones personalizadas
+const corsOptions = {
+    origin: 'https://frontend-mern-rsm6.onrender.com',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    optionsSuccessStatus: 204,
+    allowedHeaders: 'Content-Type,Authorization',
+};
 
 // Configurar cors
-// app.use(cors({
-//     origin: FRONTEND_URL
-// }));
-
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'https://frontend-mern-rsm6.onrender.com');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    next();
-});
+app.use(cors(corsOptions));
 
 // Convertir los datos del body a objetos js
 app.use(express.json());
