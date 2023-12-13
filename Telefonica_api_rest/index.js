@@ -3,7 +3,7 @@ const { connection } = require("./database/connection");
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
-const { PORT } = require("./config");
+const { PORT, FRONTEND_URL } = require("./config");
 
 // Mensaje de bienvenida
 console.log("API REST para TELEFONICA arrancada!!");
@@ -16,7 +16,9 @@ const app = express();
 const server = http.createServer(app);
 
 // Configurar cors
-app.use(cors());
+app.use(cors({
+    origin: FRONTEND_URL
+}));
 
 // Convertir los datos del body a objetos js
 app.use(express.json());
