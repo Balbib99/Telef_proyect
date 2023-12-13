@@ -47,6 +47,6 @@ app.get("/ruta-prueba", (req, res) => {
 })
 
 // Poner servidor a escuchar peticiones http
-app.listen(PORT, () => {
-    console.log("Servidor node corriendo en el puerto: " + PORT);
+app.listen(server.address().port, () => {
+    console.log("Servidor node corriendo en el puerto: " + server.address().port);
 })
