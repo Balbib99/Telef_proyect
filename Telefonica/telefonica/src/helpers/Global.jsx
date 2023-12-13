@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 const URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3900";
 
 export const Global = {
