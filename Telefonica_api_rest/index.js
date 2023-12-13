@@ -3,6 +3,7 @@ const { connection } = require("./database/connection");
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
+const { PORT } = require("./config");
 
 // Mensaje de bienvenida
 console.log("API REST para TELEFONICA arrancada!!");
@@ -48,6 +49,6 @@ app.get("/ruta-prueba", (req, res) => {
 })
 
 // Poner servidor a escuchar peticiones http
-// app.listen(server.address().port, () => {
-//     console.log("Servidor node corriendo en el puerto: " + server.address().port);
-// })
+app.listen(PORT, () => {
+    console.log("Servidor node corriendo en el puerto: " + PORT);
+})
