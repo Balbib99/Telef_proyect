@@ -16,7 +16,7 @@ const app = express();
 
 // Configurar cors con opciones personalizadas
 const corsOptions = {
-    origin: 'https://frontend-mern-rsm6.onrender.com',
+    origin: FRONTEND_URL,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     optionsSuccessStatus: 204,
