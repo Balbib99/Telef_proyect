@@ -14,17 +14,33 @@ connection();
 // Creando servidor node
 const app = express();
 
-// Configurar cors con opciones personalizadas
-const corsOptions = {
-    origin: FRONTEND_URL,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-    optionsSuccessStatus: 204,
-    allowedHeaders: 'Content-Type,Authorization',
-};
+// Middleware para habilitar CORS
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', FRONTEND_URL); // Reemplaza con la URL de tu frontend
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
 
-// Configurar cors
-app.use(cors(corsOptions));
+// Manejar solicitudes OPTIONS
+app.options('*', (req, res) => {
+    res.header('Access-Control-Allow-Origin', FRONTEND_URL);
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.sendStatus(200);
+});
+
+// // Configurar cors con opciones personalizadas
+// const corsOptions = {
+//     origin: FRONTEND_URL,
+//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//     credentials: true,
+//     optionsSuccessStatus: 204,
+//     allowedHeaders: 'Content-Type,Authorization',
+// };
+
+// // Configurar cors
+// app.use(cors(corsOptions));
 
 // Convertir los datos del body a objetos js
 app.use(express.json());
