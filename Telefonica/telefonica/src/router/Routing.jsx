@@ -22,10 +22,10 @@ export const Routing = () => {
 
                 <Route path='/social' element={<PrivateLayout />}>
                     <Route index element={<Rpc />} />
-                    <Route path='rpc' element={<Rpc />} />
-                    <Route path='ctu' element={<Ctu />} />
-                    <Route path='contact' element={<Contact />} />
-                    <Route path='file' element={<File />} />
+                    <Route path='/rpc' element={<Rpc />} />
+                    <Route path='/ctu' element={<Ctu />} />
+                    <Route path='/contact' element={<Contact />} />
+                    <Route path='/file' element={<File />} />
                 </Route>
             </Routes>
         </BrowserRouter>
