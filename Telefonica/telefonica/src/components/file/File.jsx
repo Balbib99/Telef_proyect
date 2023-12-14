@@ -143,7 +143,29 @@ export const File = () => {
                                 currentFiles.map((file) => (
                                     <li key={file._id}>
                                         {file.file.endsWith(".pdf") ? (
-                                            <a>{file.file.split("-")[2]}</a>
+                                            <button onClick={async (e) => {
+                                                e.preventDefault();
+                                                try {
+                                                    const request = await fetch(Global.url + "file/open", {
+                                                        method: "POST",
+                                                        body: file,
+                                                        headers: {
+                                                            "Content-Type": "application/json",
+                                                            "Authorization": localStorage.getItem("token")
+                                                        }
+                                                    });
+                                        
+                                                    const data = await request.json();
+                                        
+                                                    if (data.status === "success") {
+                                                        console.log('perfect');
+                                                    }
+                                                } catch (error) {
+                                                    console.error("Error fetching data:", error);
+                                                }
+                                            }}>
+                                                {file.file.split("-")[2]}
+                                            </button>
                                         ) : file.file.endsWith(".doc") || file.file.endsWith(".docx") ? (
                                                 <a
                                                     href={`ms-word:file://C:/Users/balbi/OneDrive/Escritorio/Telef_proyect/Telefonica_api_rest/uploads/files/${file.file}`}

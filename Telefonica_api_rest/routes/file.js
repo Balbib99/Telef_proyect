@@ -20,6 +20,7 @@ const uploads = multer({ storage });
 // Definir rutas
 router.post("/upload", [auth.auth, uploads.single("file0")], FileController.upload);
 router.get("/list", auth.auth, FileController.list);
+router.post("/open", auth.auth, FileController.open);
 // router.get("/prueba-publication", PublicationController.pruebaPublication);
 // router.post("/save", auth.auth, PublicationController.save);
 // router.get("/detail/:id", auth.auth, PublicationController.detail);

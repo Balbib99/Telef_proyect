@@ -5,6 +5,8 @@ const File = require("../models/file");
 const fs = require("fs");
 const path = require("path");
 
+const { exec } = require('child_process');
+
 // Subir ficheros
 const upload = (req, res) => {
 
@@ -38,7 +40,7 @@ const upload = (req, res) => {
 
     } else {
 
-        let newFile = new File({file: req.file.filename, fileMetadata: JSON.parse(req.body.fileMetadata)});
+        let newFile = new File({ file: req.file.filename, fileMetadata: JSON.parse(req.body.fileMetadata) });
         console.log(req.body.fileMetadata);
         newFile.user = req.user.id;
 
@@ -64,9 +66,9 @@ const list = (req, res) => {
 
     // Listamos todos los contactos de la bbdd (si existen)
     File.find().then((fileStorage) => {
-        
+
         if (!fileStorage || fileStorage.length <= 0) {
-            
+
             return res.status(400).send({ status: "error", message: "No se han encontrado archivos" });
 
         }
@@ -79,7 +81,7 @@ const list = (req, res) => {
         })
 
     }).catch((error) => {
-        
+
         return res.status(400).send({
             status: "error",
             message: "Ha ocurrido un error"
@@ -88,7 +90,45 @@ const list = (req, res) => {
     })
 }
 
+const open = (req, res) => {
+    const filePath = path.join(__dirname, '..', 'uploads', 'files', req.body.file);
+  
+    // Verificar si el archivo existe
+    fs.access(filePath, fs.constants.F_OK, (err) => {
+      if (err) {
+        // El archivo no existe
+        return res.status(404).send('El archivo no existe');
+      }
+  
+      // Abrir el archivo en una pestaña a parte
+      if (process.platform === 'win32') {
+        // En Windows
+        exec(`start "" "${filePath}"`, (error) => {
+          if (error) {
+            console.error(`Error al abrir el archivo: ${error.message}`);
+            return res.status(500).send('Error interno del servidor');
+          }
+  
+          // Archivo abierto con éxito
+          res.status(200).send('Archivo abierto con éxito');
+        });
+      } else {
+        // En sistemas operativos no Windows
+        exec(`open "${filePath}"`, (error) => {
+          if (error) {
+            console.error(`Error al abrir el archivo: ${error.message}`);
+            return res.status(500).send('Error interno del servidor');
+          }
+  
+          // Archivo abierto con éxito
+          res.status(200).send('Archivo abierto con éxito');
+        });
+      }
+    });
+  };
+
 module.exports = {
     upload,
-    list
+    list,
+    open
 }
