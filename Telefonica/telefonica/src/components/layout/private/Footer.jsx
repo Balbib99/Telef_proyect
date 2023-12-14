@@ -6,8 +6,7 @@ export const Footer = () => {
     const sesionClose = () => {
         localStorage.clear();
 
-         window.location.reload();
-
+        window.location.reload(true);
     }
 
     return (
