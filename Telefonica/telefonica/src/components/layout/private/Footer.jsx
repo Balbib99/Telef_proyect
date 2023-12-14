@@ -6,7 +6,7 @@ export const Footer = () => {
     const sesionClose = () => {
         localStorage.clear();
 
-        window.location.href = '/';
+        window.location.replace(`${import.meta.env.VITE_FRONTEND_URL}`);
 
     }
 
