@@ -96,6 +96,7 @@ const list = (req, res) => {
 
 const loginOneDrive = (req, res) => {
   res.redirect(`https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=https://graph.microsoft.com/files.readwrite`);
+  console.log("estoy");
 }
 
 const callback = (req, res) => {
