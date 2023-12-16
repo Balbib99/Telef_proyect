@@ -15,6 +15,13 @@ export const File = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const filesPerPage = 5;
 
+
+    useEffect(() => {
+        fetchData();
+
+        loginOneDrive();
+    }, []);
+
     //DE MOMENTO
     const handleFileInputChange = (e) => {
         const file = e.target.files[0];
@@ -60,9 +67,26 @@ export const File = () => {
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    const loginOneDrive = async () => {
+        try {
+            const request = await fetch(Global.url + "file/loginOneDrive", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": localStorage.getItem("token")
+                }
+            });
+
+            const data = await request.json();
+            console.log("ha");
+
+            if (data.status === "success") {
+                console.log("objetivo cumplido camarada");
+            }
+        } catch (error) {
+            console.error("Error loginOneDrive:", error);
+        }
+    }
 
     const filteredFiles = files.filter(contact =>
         contact.file.toLowerCase().includes(searchTerm.toLowerCase())
