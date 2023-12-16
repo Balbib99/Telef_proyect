@@ -74,7 +74,8 @@ export const File = () => {
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": localStorage.getItem("token")
-                }
+                },
+                mode: 'no-cors'
             });
 
             const data = await request.json();
