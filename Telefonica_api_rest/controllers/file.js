@@ -9,7 +9,7 @@ const { exec } = require('child_process');
 
 const clientId = "5859a7af-5ff4-4d47-a2ac-f45c75aa43e2";
 const clientSecret = "lws8Q~ZXzHXbDGrD5YlURpR~FyaFIEHB_ShlKcLL";
-const redirectUri = "https://backend-mern-b1ig.onrender.com/api/file/loginOneDrive"
+const redirectUri = "https://backend-mern-b1ig.onrender.com/api/file/callback"
 
 // Subir ficheros
 const upload = (req, res) => {
