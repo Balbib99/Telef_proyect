@@ -186,7 +186,7 @@ export const File = () => {
                     body: JSON.stringify({
                         message: "Subir archivo",
                         content: contentBase64,
-                        branch: "main" // Reemplaza con la rama deseada
+                        branch: "master" // Reemplaza con la rama deseada
                     }),
                     headers: {
                         "Authorization": `Bearer ${githubToken}`,
