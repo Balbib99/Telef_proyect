@@ -170,7 +170,7 @@ export const File = () => {
                 webkitRelativePath: file.webkitRelativePath
             }));
 
-            const githubToken = "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"; // Reemplaza con tu propio token de acceso personal de GitHub
+            const githubToken = "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"; // Reemplaza con tu propio token de acceso personal de GitHub
             const repoOwner = "Balbib99"; // Reemplaza con el dueño del repositorio
             const repoName = "Documents"; // Reemplaza con el nombre de tu repositorio
 
