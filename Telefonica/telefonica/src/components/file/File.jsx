@@ -42,6 +42,7 @@ export const File = () => {
     const handleFileChange = (e) => {
         if (e.target.files[0]) {
             setSelectedFileName(e.target.files[0].name);
+            console.log(files[0]);
         } else {
             setSelectedFileName(null);
         }
