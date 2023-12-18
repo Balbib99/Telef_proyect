@@ -3,6 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { Global } from '../../helpers/Global';
 
+import fs from 'fs';
+import { Octokit } from '@octokit/rest';
+
 export const File = () => {
     const [files, setFiles] = useState([]);
 
@@ -155,60 +158,57 @@ export const File = () => {
     const sendFile = async (e) => {
         e.preventDefault();
 
-        const fileInput = document.querySelector("#file0");
+        // Configurar el cliente de la API de GitHub
+        const octokit = new Octokit({
+            auth: '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', // Reemplaza con tu token de acceso personal de GitHub
+        });
 
-        if (fileInput.files[0]) {
+        // Nombre del repositorio y propietario
+        const repoOwner = 'Balbib99';
+        const repoName = 'Documents';
+
+        // Obtener el input de tipo file
+        const fileInput = document.querySelector('#file0'); // Asegúrate de tener un elemento con el id 'fileInput' en tu HTML
+
+        // Verificar si se seleccionó un archivo
+        if (fileInput.files.length > 0) {
+            // Obtener información del archivo seleccionado
             const file = fileInput.files[0];
+            const fileName = file.name;
+            const fileContent = fs.readFileSync(file.path);
 
-            const formData = new FormData();
-            formData.append("file0", fileInput.files[0]);
-            formData.append("fileMetadata", JSON.stringify({
-                name: file.name,
-                lastModified: file.lastModified,
-                lastModifiedDate: file.lastModifiedDate,
-                size: file.size,
-                type: file.type,
-                webkitRelativePath: file.webkitRelativePath
-            }));
+            // Obtener información del archivo existente (si existe)
+            let existingFileSha = null;
+            try {
+                const { data } = await octokit.repos.getContent({
+                    owner: repoOwner,
+                    repo: repoName,
+                    path: fileName,
+                    ref: 'master', // Reemplaza con la rama deseada
+                });
+                existingFileSha = data.sha;
+            } catch (error) {
+                // Ignorar error si el archivo no existe todavía
+            }
 
-            const githubToken = "Error al subir archivo: octokit.repos.createOrUpdateFile is not a function"; // Reemplaza con tu propio token de acceso personal de GitHub
-            const repoOwner = "Balbib99"; // Reemplaza con el dueño del repositorio
-            const repoName = "Documents"; // Reemplaza con el nombre de tu repositorio
-
-            // Leer el contenido del archivo como base64
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-
-            reader.onloadend = async () => {
-                const contentBase64 = reader.result.split(",")[1];
-
-                const uploadRequest = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${file.name}`, {
-                    method: "PUT",
-                    body: JSON.stringify({
-                        message: "Subir archivo",
-                        content: contentBase64,
-                        branch: "master" // Reemplaza con la rama deseada
-                    }),
-                    headers: {
-                        "Authorization": `Bearer ${githubToken}`,
-                        "Content-Type": "application/json",
-                    },
+            // Subir el archivo al repositorio
+            try {
+                const { data } = await octokit.repos.createOrUpdateFileContents({
+                    owner: repoOwner,
+                    repo: repoName,
+                    path: fileName,
+                    message: 'Subir archivo',
+                    content: fileContent.toString('base64'),
+                    branch: 'master', // Reemplaza con la rama deseada
+                    sha: existingFileSha, // Proporcionar el sha del archivo existente
                 });
 
-                const uploadData = await uploadRequest.json();
-
-                if (uploadRequest.ok) {
-                    setStored("stored");
-                    setSelectedFileName(null);
-
-                    setTimeout(() => {
-                        setStored("not_stored");
-                        fetchData();
-                    }, 2000);
-                } else {
-                    setStored("error");
-                }
-            };
+                console.log(`Archivo subido: ${data.content.html_url}`);
+            } catch (error) {
+                console.error(`Error al subir archivo: ${error.message}`);
+            }
+        } else {
+            console.error('No se seleccionó ningún archivo.');
         }
     };
 
