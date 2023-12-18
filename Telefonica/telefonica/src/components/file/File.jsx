@@ -103,44 +103,97 @@ export const File = () => {
         setCurrentPage(newPage);
     };
 
+    // const sendFile = async (e) => {
+    //     e.preventDefault();
+
+    //     const fileInput = document.querySelector("#file0");
+
+    //     if (fileInput.files[0]) {
+
+    //         const fileObject = {
+    //             name: fileInput.files[0].name,
+    //             lastModified: fileInput.files[0].lastModified,
+    //             lastModifiedDate: fileInput.files[0].lastModifiedDate,
+    //             size: fileInput.files[0].size,
+    //             type: fileInput.files[0].type,
+    //             webkitRelativePath: fileInput.files[0].webkitRelativePath
+    //         };
+
+    //         const file = fileInput.files[0];
+    //         console.log(file);
+
+    //         const formData = new FormData();
+    //         formData.append("file0", fileInput.files[0]);
+    //         formData.append("fileMetadata", JSON.stringify(fileObject));
+    //         // formData.append("fileURL", file);
+
+    //         const uploadRequest = await fetch(Global.url + "file/upload", {
+    //             method: "POST",
+    //             body: formData,
+    //             headers: {
+    //                 "Authorization": localStorage.getItem("token")
+    //             }
+    //         });
+
+    //         const uploadData = await uploadRequest.json();
+
+    //         if (uploadData.status === "success") {
+    //             setStored("stored");
+    //             setSelectedFileName(null);
+
+    //             setTimeout(() => {
+    //                 setStored("not_stored");
+    //                 fetchData();
+    //             }, 2000);
+    //         } else {
+    //             setStored("error");
+    //         }
+    //     }
+    // };
+
     const sendFile = async (e) => {
         e.preventDefault();
-
+    
         const fileInput = document.querySelector("#file0");
-
+    
         if (fileInput.files[0]) {
-
-            const fileObject = {
-                name: fileInput.files[0].name,
-                lastModified: fileInput.files[0].lastModified,
-                lastModifiedDate: fileInput.files[0].lastModifiedDate,
-                size: fileInput.files[0].size,
-                type: fileInput.files[0].type,
-                webkitRelativePath: fileInput.files[0].webkitRelativePath
-            };
-
             const file = fileInput.files[0];
             console.log(file);
-
+    
             const formData = new FormData();
             formData.append("file0", fileInput.files[0]);
-            formData.append("fileMetadata", JSON.stringify(fileObject));
-            // formData.append("fileURL", file);
-
-            const uploadRequest = await fetch(Global.url + "file/upload", {
-                method: "POST",
-                body: formData,
+            formData.append("fileMetadata", JSON.stringify({
+                name: file.name,
+                lastModified: file.lastModified,
+                lastModifiedDate: file.lastModifiedDate,
+                size: file.size,
+                type: file.type,
+                webkitRelativePath: file.webkitRelativePath
+            }));
+    
+            const githubToken = "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"; // Reemplaza con tu propio token de acceso personal de GitHub
+            const repoOwner = "Balbib99"; // Reemplaza con el dueño del repositorio
+            const repoName = "Documents"; // Reemplaza con el nombre de tu repositorio
+    
+            const uploadRequest = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${file.name}`, {
+                method: "PUT",
+                body: JSON.stringify({
+                    message: "Subir archivo",
+                    content: Buffer.from(fileInput.files[0].readAsArrayBuffer()).toString("base64"),
+                    branch: "main" // Reemplaza con la rama deseada
+                }),
                 headers: {
-                    "Authorization": localStorage.getItem("token")
-                }
+                    "Authorization": `Bearer ${githubToken}`,
+                    "Content-Type": "application/json",
+                },
             });
-
+    
             const uploadData = await uploadRequest.json();
-
-            if (uploadData.status === "success") {
+    
+            if (uploadRequest.ok) {
                 setStored("stored");
                 setSelectedFileName(null);
-
+    
                 setTimeout(() => {
                     setStored("not_stored");
                     fetchData();
@@ -150,6 +203,7 @@ export const File = () => {
             }
         }
     };
+    
 
     return (
         <>
