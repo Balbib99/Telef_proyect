@@ -19,7 +19,7 @@ export const File = () => {
     useEffect(() => {
         fetchData();
 
-        loginOneDrive();
+        // loginOneDrive();
     }, []);
 
     //DE MOMENTO
@@ -67,27 +67,27 @@ export const File = () => {
         }
     };
 
-    const loginOneDrive = async () => {
-        try {
-            const request = await fetch(Global.url + "file/loginOneDrive", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": localStorage.getItem("token")
-                },
-                mode: 'no-cors'
-            });
+    // const loginOneDrive = async () => {
+    //     try {
+    //         const request = await fetch(Global.url + "file/loginOneDrive", {
+    //             method: "GET",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //                 "Authorization": localStorage.getItem("token")
+    //             },
+    //             mode: 'no-cors'
+    //         });
 
-            const data = await request.json();
-            console.log("ha");
+    //         const data = await request.json();
+    //         console.log("ha");
 
-            if (data.status === "success") {
-                console.log("objetivo cumplido camarada");
-            }
-        } catch (error) {
-            console.error("Error loginOneDrive:", error);
-        }
-    }
+    //         if (data.status === "success") {
+    //             console.log("objetivo cumplido camarada");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error loginOneDrive:", error);
+    //     }
+    // }
 
     const filteredFiles = files.filter(contact =>
         contact.file.toLowerCase().includes(searchTerm.toLowerCase())
@@ -153,13 +153,12 @@ export const File = () => {
 
     const sendFile = async (e) => {
         e.preventDefault();
-    
+
         const fileInput = document.querySelector("#file0");
-    
+
         if (fileInput.files[0]) {
             const file = fileInput.files[0];
-            console.log(file);
-    
+
             const formData = new FormData();
             formData.append("file0", fileInput.files[0]);
             formData.append("fileMetadata", JSON.stringify({
@@ -170,40 +169,49 @@ export const File = () => {
                 type: file.type,
                 webkitRelativePath: file.webkitRelativePath
             }));
-    
+
             const githubToken = "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"; // Reemplaza con tu propio token de acceso personal de GitHub
             const repoOwner = "Balbib99"; // Reemplaza con el dueño del repositorio
             const repoName = "Documents"; // Reemplaza con el nombre de tu repositorio
-    
-            const uploadRequest = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${file.name}`, {
-                method: "PUT",
-                body: JSON.stringify({
-                    message: "Subir archivo",
-                    content: Buffer.from(fileInput.files[0].readAsArrayBuffer()).toString("base64"),
-                    branch: "main" // Reemplaza con la rama deseada
-                }),
-                headers: {
-                    "Authorization": `Bearer ${githubToken}`,
-                    "Content-Type": "application/json",
-                },
-            });
-    
-            const uploadData = await uploadRequest.json();
-    
-            if (uploadRequest.ok) {
-                setStored("stored");
-                setSelectedFileName(null);
-    
-                setTimeout(() => {
-                    setStored("not_stored");
-                    fetchData();
-                }, 2000);
-            } else {
-                setStored("error");
-            }
+
+            // Leer el contenido del archivo como base64
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+
+            reader.onloadend = async () => {
+                const contentBase64 = reader.result.split(",")[1];
+
+                const uploadRequest = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/contents/${file.name}`, {
+                    method: "PUT",
+                    body: JSON.stringify({
+                        message: "Subir archivo",
+                        content: contentBase64,
+                        branch: "main" // Reemplaza con la rama deseada
+                    }),
+                    headers: {
+                        "Authorization": `Bearer ${githubToken}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                const uploadData = await uploadRequest.json();
+
+                if (uploadRequest.ok) {
+                    setStored("stored");
+                    setSelectedFileName(null);
+
+                    setTimeout(() => {
+                        setStored("not_stored");
+                        fetchData();
+                    }, 2000);
+                } else {
+                    setStored("error");
+                }
+            };
         }
     };
-    
+
+
 
     return (
         <>
@@ -233,9 +241,9 @@ export const File = () => {
                                                             "Authorization": localStorage.getItem("token")
                                                         }
                                                     });
-                                        
+
                                                     const data = await request.json();
-                                        
+
                                                     if (data.status === "success") {
                                                         console.log('perfect');
                                                     }
@@ -246,21 +254,21 @@ export const File = () => {
                                                 {file.file.split("-")[2]}
                                             </button>
                                         ) : file.file.endsWith(".doc") || file.file.endsWith(".docx") ? (
-                                                <a
-                                                    href={`ms-word:file://C:/Users/balbi/OneDrive/Escritorio/Telef_proyect/Telefonica_api_rest/uploads/files/${file.file}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                >
-                                                    {file.file.split("-")[2]}
-                                                </a>
+                                            <a
+                                                href={`ms-word:file://C:/Users/balbi/OneDrive/Escritorio/Telef_proyect/Telefonica_api_rest/uploads/files/${file.file}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                {file.file.split("-")[2]}
+                                            </a>
                                         ) : file.file.endsWith(".csv") || file.file.endsWith(".xlsx") ? (
                                             <a
-                                                    href={`ms-excel:file://C:/Users/balbi/OneDrive/Escritorio/Telef_proyect/Telefonica_api_rest/uploads/files/${file.file}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                >
-                                                    {file.file.split("-")[2]}
-                                                </a>
+                                                href={`ms-excel:file://C:/Users/balbi/OneDrive/Escritorio/Telef_proyect/Telefonica_api_rest/uploads/files/${file.file}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                {file.file.split("-")[2]}
+                                            </a>
                                         ) : (
                                             // Manejar otros tipos de archivos según sea necesario
                                             <span>Archivo no compatible: {file.file}</span>
@@ -289,7 +297,7 @@ export const File = () => {
                                 id='file1'
                                 onChange={handleFileInputChange}
                             />
-                            <label htmlFor="file1" className='fileLabel' style={{marginTop: '20px', backgroundColor: '#f54444'}}>
+                            <label htmlFor="file1" className='fileLabel' style={{ marginTop: '20px', backgroundColor: '#f54444' }}>
                                 {selectedFileName ? selectedFileName : "Selecciona un .pdf"}
                             </label>
                         </div>
