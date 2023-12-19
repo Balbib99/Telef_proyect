@@ -171,19 +171,28 @@ export const File = () => {
                 mode: "no-cors"
             });
 
-            const uploadData = await uploadRequest.json();
-
-            if (uploadData) {
-                setStored("stored");
-                setSelectedFileName(null);
-
-                setTimeout(() => {
-                    setStored("not_stored");
-                    fetchData();
-                }, 2000);
+            if (uploadRequest.ok) {
+                const result = await uploadRequest.json();
+                console.log("File uploaded successfully:", result);
+                // Handle success here
             } else {
-                setStored("error");
+                console.error("Error uploading file:", response.statusText);
+                // Handle error here
             }
+
+            // const uploadData = await uploadRequest.json();
+
+            // if (uploadData) {
+            //     setStored("stored");
+            //     setSelectedFileName(null);
+
+            //     setTimeout(() => {
+            //         setStored("not_stored");
+            //         fetchData();
+            //     }, 2000);
+            // } else {
+            //     setStored("error");
+            // }
         }
     };
 
