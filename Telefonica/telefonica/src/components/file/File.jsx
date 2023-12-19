@@ -173,7 +173,7 @@ export const File = () => {
 
             const uploadData = await uploadRequest.json();
 
-            if (uploadData.status === "success") {
+            if (uploadData) {
                 setStored("stored");
                 setSelectedFileName(null);
 
