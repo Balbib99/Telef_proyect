@@ -70,12 +70,10 @@ const upload = (req, res) => {
 
   // Recoger el fichero y comprobar que existe
   if (!req.file) {
-
-    return req.status(404).send({
+    return res.status(404).send({
       status: "error",
       message: "La petición no incluye ningún archivo"
-    })
-
+    });
   }
 
   // Conseguir el nombre del archivo
