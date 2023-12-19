@@ -5,6 +5,7 @@ const File = require("../models/file");
 const fs = require("fs");
 const path = require("path");
 const fetch = require('node-fetch');
+import { Octokit } from '@octokit/rest';
 
 const { exec } = require('child_process');
 
@@ -66,7 +67,7 @@ const redirectUri = "https://backend-mern-b1ig.onrender.com/api/file/callback"
 //   }
 // }
 
-const upload = (req, res) => {
+const upload = async (req, res) => {
 
   // Recoger el fichero y comprobar que existe
   if (!req.file) {
@@ -76,82 +77,137 @@ const upload = (req, res) => {
     });
   }
 
-  // Conseguir el nombre del archivo
-  let fileObject = req.file;
+  // Configurar el cliente de la API de GitHub
+  const octokit = new Octokit({
+    auth: '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', // Reemplaza con tu token de acceso personal de GitHub
+  });
 
-  // Configuración
+  // Nombre del repositorio y propietario
   const repoOwner = 'Balbib99';
   const repoName = 'Documents';
-  const branchName = 'master'; // Rama donde se subirá el archivo
 
-  // Token de acceso personal de GitHub
-  const githubToken = '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';
+  // Obtener el input de tipo file
+  const fileInput = req.file // Asegúrate de tener un elemento con el id 'fileInput' en tu HTML
+  console.log("fileInput:" + fileInput);
 
-  uploadFile(fileObject);
+  // Verificar si se seleccionó un archivo
+  if (fileInput.files.length > 0) {
+    // Obtener información del archivo seleccionado
+    const file = fileInput.files[0];
+    const fileName = file.name;
+    const fileContent = fs.readFileSync(file.path);
 
-  // Subir el archivo al repositorio
-  async function uploadFile(file) {
+    // Obtener información del archivo existente (si existe)
+    let existingFileSha = null;
     try {
-      // Leer el contenido del archivo en base64
-      const fileContent = fs.readFileSync(file.path, 'base64');
-
-      // Construir el cuerpo de la solicitud
-      const requestBody = {
-        message: 'Subir archivo',
-        content: fileContent,
-        branch: branchName,
-      };
-
-      // Obtener información del archivo existente (si existe)
-      let existingFileSha = null;
-      try {
-        const response = await fetch(
-          `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${file.name}?ref=${branchName}`,
-          {
-            method: 'GET',
-            headers: {
-              Authorization: `Bearer ${githubToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        if (response.ok) {
-          const fileInfo = await response.json();
-          existingFileSha = fileInfo.sha;
-        }
-      } catch (error) {
-        // Ignorar error si el archivo no existe todavía
-      }
-
-      // Si el archivo existe, incluir el SHA en el cuerpo de la solicitud
-      if (existingFileSha) {
-        requestBody.sha = existingFileSha;
-      }
-
-      // Subir el archivo al repositorio
-      const response = await fetch(
-        `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${file.name}`,
-        {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${githubToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        }
-      );
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log(`Archivo subido: ${result.content.html_url}`);
-      } else {
-        console.error(`Error al subir archivo: ${response.statusText}`);
-      }
+      const { data } = await octokit.repos.getContent({
+        owner: repoOwner,
+        repo: repoName,
+        path: fileName,
+        ref: 'master', // Reemplaza con la rama deseada
+      });
+      existingFileSha = data.sha;
     } catch (error) {
-      console.error(`Error en la solicitud: ${error.message}`);
+      // Ignorar error si el archivo no existe todavía
     }
+
+    // Subir el archivo al repositorio
+    try {
+      const { data } = await octokit.repos.createOrUpdateFileContents({
+        owner: repoOwner,
+        repo: repoName,
+        path: fileName,
+        message: 'Subir archivo',
+        content: fileContent.toString('base64'),
+        branch: 'master', // Reemplaza con la rama deseada
+        sha: existingFileSha, // Proporcionar el sha del archivo existente
+      });
+
+      console.log(`Archivo subido: ${data.content.html_url}`);
+    } catch (error) {
+      console.error(`Error al subir archivo: ${error.message}`);
+    }
+  } else {
+    console.error('No se seleccionó ningún archivo.');
   }
+
+
+  // // Conseguir el nombre del archivo
+  // let fileObject = req.file;
+
+  // // Configuración
+  // const repoOwner = 'Balbib99';
+  // const repoName = 'Documents';
+  // const branchName = 'master'; // Rama donde se subirá el archivo
+
+  // // Token de acceso personal de GitHub
+  // const githubToken = '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';
+
+  // uploadFile(fileObject);
+
+  // // Subir el archivo al repositorio
+  // async function uploadFile(file) {
+  //   try {
+  //     // Leer el contenido del archivo en base64
+  //     const fileContent = fs.readFileSync(file.path, 'base64');
+
+  //     // Construir el cuerpo de la solicitud
+  //     const requestBody = {
+  //       message: 'Subir archivo',
+  //       content: fileContent,
+  //       branch: branchName,
+  //     };
+
+  //     // Obtener información del archivo existente (si existe)
+  //     let existingFileSha = null;
+  //     try {
+  //       const response = await fetch(
+  //         `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${file.name}?ref=${branchName}`,
+  //         {
+  //           method: 'GET',
+  //           headers: {
+  //             Authorization: `Bearer ${githubToken}`,
+  //             'Content-Type': 'application/json',
+  //           },
+  //         }
+  //       );
+
+  //       if (response.ok) {
+  //         const fileInfo = await response.json();
+  //         existingFileSha = fileInfo.sha;
+  //       }
+  //     } catch (error) {
+  //       // Ignorar error si el archivo no existe todavía
+  //     }
+
+  //     // Si el archivo existe, incluir el SHA en el cuerpo de la solicitud
+  //     if (existingFileSha) {
+  //       requestBody.sha = existingFileSha;
+  //     }
+
+  //     // Subir el archivo al repositorio
+  //     const response = await fetch(
+  //       `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${file.name}`,
+  //       {
+  //         method: 'PUT',
+  //         headers: {
+  //           Authorization: `Bearer ${githubToken}`,
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify(requestBody),
+  //       }
+  //     );
+
+  //     if (response.ok) {
+  //       const result = await response.json();
+  //       console.log(`Archivo subido: ${result.content.html_url}`);
+  //     } else {
+  //       console.error(`Error al subir archivo: ${response.statusText}`);
+  //     }
+  //   } catch (error) {
+  //     console.error(`Error en la solicitud: ${error.message}`);
+  //   }
+  // }
 
 
 
