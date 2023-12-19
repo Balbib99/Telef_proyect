@@ -5,7 +5,7 @@ const File = require("../models/file");
 const fs = require("fs");
 const path = require("path");
 const fetch = require('node-fetch');
-import { Octokit } from '@octokit/rest';
+const { Octokit } = require('@octokit/rest');
 
 const { exec } = require('child_process');
 
