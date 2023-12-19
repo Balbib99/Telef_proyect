@@ -159,11 +159,12 @@ export const File = () => {
 
         if (fileInput.files[0]) {
 
-            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append("file0", fileInput.files[0]);
 
             const uploadRequest = await fetch(Global.url + "file/upload", {
                 method: "POST",
-                body: file,
+                body: formData,
                 headers: {
                     "Authorization": localStorage.getItem("token")
                 }
