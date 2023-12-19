@@ -176,7 +176,7 @@ export const File = () => {
                 console.log("File uploaded successfully:", result);
                 // Handle success here
             } else {
-                console.error("Error uploading file:", uploadRequest.statusText);
+                console.error("Error uploading file:", uploadRequest.error);
                 // Handle error here
             }
 
