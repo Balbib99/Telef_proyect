@@ -3,9 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { Global } from '../../helpers/Global';
 
-import fs from 'fs';
-import fetch from 'node-fetch';
-
 export const File = () => {
     const [files, setFiles] = useState([]);
 
@@ -158,87 +155,34 @@ export const File = () => {
     const sendFile = async (e) => {
         e.preventDefault();
 
-        // Configuración
-        const repoOwner = 'Balbib99';
-        const repoName = 'Documents';
-        const branchName = 'master'; // Rama donde se subirá el archivo
+        const fileInput = document.querySelector("#file0");
 
-        // Token de acceso personal de GitHub
-        const githubToken = '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';
+        if (fileInput.files[0]) {
 
-        // Obtener el elemento input de tipo file
-        const fileInput = document.getElementById('file0');
+            const file = fileInput.files[0];
 
-        // Función para manejar el cambio en el input file
-        const selectedFile = fileInput.files[0];
-        if (selectedFile) {
-            uploadFile(selectedFile);
-        }
-
-        // Subir el archivo al repositorio
-        async function uploadFile(file) {
-            try {
-                // Leer el contenido del archivo en base64
-                const fileContent = fs.readFileSync(file.path, 'base64');
-
-                // Construir el cuerpo de la solicitud
-                const requestBody = {
-                    message: 'Subir archivo',
-                    content: fileContent,
-                    branch: branchName,
-                };
-
-                // Obtener información del archivo existente (si existe)
-                let existingFileSha = null;
-                try {
-                    const response = await fetch(
-                        `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${file.name}?ref=${branchName}`,
-                        {
-                            method: 'GET',
-                            headers: {
-                                Authorization: `Bearer ${githubToken}`,
-                                'Content-Type': 'application/json',
-                            },
-                        }
-                    );
-
-                    if (response.ok) {
-                        const fileInfo = await response.json();
-                        existingFileSha = fileInfo.sha;
-                    }
-                } catch (error) {
-                    // Ignorar error si el archivo no existe todavía
+            const uploadRequest = await fetch(Global.url + "file/upload", {
+                method: "POST",
+                body: file,
+                headers: {
+                    "Authorization": localStorage.getItem("token")
                 }
+            });
 
-                // Si el archivo existe, incluir el SHA en el cuerpo de la solicitud
-                if (existingFileSha) {
-                    requestBody.sha = existingFileSha;
-                }
+            const uploadData = await uploadRequest.json();
 
-                // Subir el archivo al repositorio
-                const response = await fetch(
-                    `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${file.name}`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            Authorization: `Bearer ${githubToken}`,
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(requestBody),
-                    }
-                );
+            if (uploadData.status === "success") {
+                setStored("stored");
+                setSelectedFileName(null);
 
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log(`Archivo subido: ${result.content.html_url}`);
-                } else {
-                    console.error(`Error al subir archivo: ${response.statusText}`);
-                }
-            } catch (error) {
-                console.error(`Error en la solicitud: ${error.message}`);
+                setTimeout(() => {
+                    setStored("not_stored");
+                    fetchData();
+                }, 2000);
+            } else {
+                setStored("error");
             }
         }
-
     };
 
 
