@@ -167,7 +167,8 @@ export const File = () => {
                 body: formData,
                 headers: {
                     "Authorization": localStorage.getItem("token")
-                }
+                },
+                mode: "no-cors"
             });
 
             const uploadData = await uploadRequest.json();
