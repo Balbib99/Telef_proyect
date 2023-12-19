@@ -124,6 +124,13 @@ const upload = async (req, res) => {
       });
 
       console.log(`Archivo subido: ${data.content.html_url}`);
+
+      return res.status(200).send({
+        status: "success",
+        message: "fichero guardado",
+        fileInput
+      })
+
     } catch (error) {
       console.error(`Error al subir archivo: ${error.message}`);
     }
