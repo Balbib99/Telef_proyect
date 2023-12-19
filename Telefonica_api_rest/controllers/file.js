@@ -133,6 +133,7 @@ const upload = async (req, res) => {
 
     } catch (error) {
       console.error(`Error al subir archivo: ${error.message}`);
+      return res.status(400).send({ status: "error", message: "Ha habido algún error", error: error });
     }
   } else {
     console.error('No se seleccionó ningún archivo.');
