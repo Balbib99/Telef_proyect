@@ -2,22 +2,17 @@
 const { connection } = require("./database/connection");
 const express = require("express");
 const cors = require("cors");
-const http = require("http");
-const { PORT, FRONTEND_URL } = require("./config");
 
 // Mensaje de bienvenida
 console.log("API REST para TELEFONICA arrancada!!");
 
 //Conexión a la bbdd
 connection();
+const port = 3000;
 
 // Creando servidor node
 const app = express();
-app.use(cors({
-    origin: 'https://frontend-mern-rsm6.onrender.com',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  }));
+app.use(cors());
 
 // Convertir los datos del body a objetos js
 app.use(express.json());
@@ -50,6 +45,6 @@ app.get("/ruta-prueba", (req, res) => {
 })
 
 // Poner servidor a escuchar peticiones http
-app.listen(PORT, () => {
-    console.log("Servidor node corriendo en el puerto: " + PORT);
+app.listen(port, () => {
+    console.log("Servidor node corriendo en el puerto: " + port);
 })

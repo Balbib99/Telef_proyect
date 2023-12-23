@@ -1,10 +1,9 @@
 const mongoose = require("mongoose");
-const { DB_DATABASE_LOCAL } = require("../config");
 
 const connection = async() => {
     try {
         
-        await mongoose.connect(`${DB_DATABASE_LOCAL}/telefonica`);
+        await mongoose.connect(`mongodb://127.0.0.1:27017/telefonica`);
         
 
         console.log("Conectado correctamente a mi bd: telefonica");

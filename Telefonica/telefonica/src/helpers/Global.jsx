@@ -1,6 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
-const URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3900";
-
 export const Global = {
-    url: `${URL}/api/`
+    url: "http://localhost:3000/api/"
 };
